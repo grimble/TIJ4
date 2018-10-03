@@ -19,5 +19,6 @@
     <orderEntry type="library" name="javassist" level="project" />
     <orderEntry type="library" name="swt" level="project" />
     <orderEntry type="library" name="xom-1.2.10" level="project" />
+    <orderEntry type="library" name="org.jetbrains:annotations-java5:16.0.2" level="application" />
   </component>
 </module>
