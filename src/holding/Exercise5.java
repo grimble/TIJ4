@@ -27,7 +27,7 @@ public class Exercise5 {
 
     public static void main(String[] args) {
 
-        StringPets.initRand(47);
+        Pets.initRand(47);
 
         Random rand = new Random(47);
 
