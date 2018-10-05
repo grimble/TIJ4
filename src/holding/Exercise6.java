@@ -4,26 +4,35 @@ import java.util.*;
 
 import static net.mindview.util.Print.print;
 
-class Pets {
-    
+class StringPets {
+
+    static int LENGTH= 7;
+
     static Random rand;
-    
+
     static void initRand(int seed) {
         rand= new Random(seed);
     }
-    
-    static List<Integer> arrayList(int len) {
 
-        List<Integer> pets= new ArrayList<Integer>();
-        for (int i=0; i < len; i++) {
-            pets.add(rand.nextInt(100));
-        }
+    static String next() {
+        StringBuffer sb= new StringBuffer();
+        for (int j = 0; j < LENGTH; j++)
+            sb.append((char) ((int)'A' + rand.nextInt((int)'Z' - (int)'A' + 1)));
+        return sb.toString();
+    }
+
+    static List<String> arrayList(int len) {
+
+        List<String> pets= new ArrayList<String>();
+        for (int i=0; i < len; i++)
+            pets.add(next());
+
         return pets;
-        
+
     }
 }
 
-public class Exercise5 {
+public class Exercise6 {
 
     public static void main(String[] args) {
 
@@ -32,11 +41,11 @@ public class Exercise5 {
         Random rand = new Random(47);
 
         // When Integer all comparisons by value
-        List<Integer> pets = Pets.arrayList(7);
+        List<String> pets = StringPets.arrayList(7);
 
         print("1: " + pets);
 
-        Integer h = rand.nextInt(100);
+        String h = StringPets.next();
 
         pets.add(h); // Automatically resizes
 
@@ -45,11 +54,11 @@ public class Exercise5 {
 
         pets.remove(h); // Remove by object
 
-        Integer p = pets.get(2);
+        String p = pets.get(2);
 
         print("4: " +  p + " " + pets.indexOf(p));
 
-        Integer cymric = rand.nextInt(100);
+        String cymric = StringPets.next();
 
         print("5: " + pets.indexOf(cymric));
         print("6: " + pets.remove(cymric));
@@ -58,11 +67,11 @@ public class Exercise5 {
         print("7: " + pets.remove(p));
         print("8: " + pets);
 
-        pets.add(3, rand.nextInt(100)); // Insert at an index
+        pets.add(3, StringPets.next()); // Insert at an index
 
         print("9: " + pets);
 
-        List<Integer> sub = pets.subList(1, 4);
+        List<String> sub = pets.subList(1, 4);
 
         print("subList: " + sub);
         print("10: " + pets.containsAll(sub));
@@ -79,7 +88,7 @@ public class Exercise5 {
         print("shuffled subList: " + sub);
         print("12: " + pets.containsAll(sub));
 
-        List<Integer> copy = new ArrayList<Integer>(pets);
+        List<String> copy = new ArrayList<String>(pets);
 
         sub = Arrays.asList(pets.get(1), pets.get(4));
 
@@ -89,7 +98,7 @@ public class Exercise5 {
 
         print("13: " + copy);
 
-        copy = new ArrayList<Integer>(pets); // Get a fresh copy
+        copy = new ArrayList<String>(pets); // Get a fresh copy
         copy.remove(2); // Remove by index
 
         print("14: " + copy);
@@ -98,7 +107,7 @@ public class Exercise5 {
 
         print("15: " + copy);
 
-        copy.set(1, rand.nextInt(100)); // Replace an element
+        copy.set(1, StringPets.next()); // Replace an element
 
         print("16: " + copy);
 
@@ -112,7 +121,7 @@ public class Exercise5 {
         print("19: " + pets);
         print("20: " + pets.isEmpty());
 
-        pets.addAll(Pets.arrayList(4));
+        pets.addAll(StringPets.arrayList(4));
 
         print("21: " + pets);
 
@@ -120,8 +129,7 @@ public class Exercise5 {
 
         print("22: " + o[3]);
 
-        Integer[] pa = pets.toArray(new Integer[0]);
-
+//        String[] pa = pets.toArray(new Integer[0]);
 //        print("23: " + pa[3].id());
     }
 
