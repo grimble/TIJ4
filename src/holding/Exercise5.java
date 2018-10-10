@@ -8,18 +8,21 @@ class Pets {
     
     static Random rand;
     
+    static int DIM= 10000;
+    
     static void initRand(int seed) {
         rand= new Random(seed);
     }
+
+    static Integer next() { return rand.nextInt(Pets.DIM); }
     
     static List<Integer> arrayList(int len) {
 
         List<Integer> pets= new ArrayList<Integer>();
         for (int i=0; i < len; i++) {
-            pets.add(rand.nextInt(100));
+            pets.add(Pets.next());
         }
         return pets;
-        
     }
 }
 
@@ -29,14 +32,14 @@ public class Exercise5 {
 
         Pets.initRand(47);
 
-        Random rand = new Random(47);
+        Random rand = new Random(48);
 
         // When Integer all comparisons by value
         List<Integer> pets = Pets.arrayList(7);
 
         print("1: " + pets);
 
-        Integer h = rand.nextInt(100);
+        Integer h = rand.nextInt(Pets.DIM);
 
         pets.add(h); // Automatically resizes
 
@@ -49,7 +52,7 @@ public class Exercise5 {
 
         print("4: " +  p + " " + pets.indexOf(p));
 
-        Integer cymric = rand.nextInt(100);
+        Integer cymric = rand.nextInt(Pets.DIM);
 
         print("5: " + pets.indexOf(cymric));
         print("6: " + pets.remove(cymric));
