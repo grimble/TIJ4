@@ -2,6 +2,7 @@ package holding;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import static net.mindview.util.Print.*;
 
@@ -24,6 +25,10 @@ public class Exercise1 {
 
         for (int i=0; i < 10; i++) {
             gl.get(i).hop();
+        }
+
+        for (Iterator<Gebril> it= gl.iterator(); it.hasNext();) {
+            it.next().hop();
         }
 
         print(gl);
