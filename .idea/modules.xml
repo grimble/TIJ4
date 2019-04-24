@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TIJ4.iml" filepath="$PROJECT_DIR$/TIJ4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../TIJ4-util/TIJ4-util.iml" filepath="$PROJECT_DIR$/../TIJ4-util/TIJ4-util.iml" />
     </modules>
   </component>
 </project>

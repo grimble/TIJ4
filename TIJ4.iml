@@ -22,5 +22,6 @@
     <orderEntry type="library" name="javassist" level="project" />
     <orderEntry type="library" name="swt" level="project" />
     <orderEntry type="library" name="xom-1.2.10" level="project" />
+    <orderEntry type="module" module-name="TIJ4-util" />
   </component>
 </module>
