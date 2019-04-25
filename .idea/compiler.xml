@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/UseList.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/HijackedInterface.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/NonCovariantGenerics.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/Manipulation.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/initialization/OverloadingVarargs2.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/MultipleInterfaceVariants.java" />
+      <file url="file://$PROJECT_DIR$/../TIJ4-code/examples/generics/CheckedList.java" />
+    </excludeFromCompile>
+  </component>
+</project>
