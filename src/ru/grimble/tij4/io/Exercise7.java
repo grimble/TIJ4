@@ -27,13 +27,15 @@ public class Exercise7 {
 
     public static void printReversed(String fileName, OutputModifier m) throws IOException {
 
-        BufferedReader isr= new BufferedReader(new FileReader(fileName));
+        BufferedReader br= new BufferedReader(new FileReader(fileName));
 
         String s;
         LinkedList<String> ll= new LinkedList<String>();
 
-        while((s= isr.readLine()) != null)
+        while((s= br.readLine()) != null)
             ll.addLast(s);
+
+        br.close();
 
         System.out.format("Contents of %s, reversed, modification %s:\n", fileName, m);
 
