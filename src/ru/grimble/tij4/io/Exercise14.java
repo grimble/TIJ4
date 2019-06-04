@@ -16,7 +16,7 @@ public class Exercise14 {
         Date start= new Date();
 
         for (int i=0; i < 10000 ; i++) {
-            StringBuffer sb= new StringBuffer();
+            StringBuilder sb= new StringBuilder();
             for (int j=0; j < 1000; j++) {
                 sb.append((char)(r.nextInt(122-32) + 32));
             }
