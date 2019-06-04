@@ -10,27 +10,30 @@ public class Exercise15 {
 
     public static void main(String[] args) {
 
-        Set<String> methodNames= new HashSet<String>();
         Set<Class> dataTypes= new HashSet<Class>();
 
         for (Method method : DataOutputStream.class.getMethods()) {
 
+            // skip inhereted methods
+            if (method.getDeclaringClass() != DataOutputStream.class)
+                continue;
+
             Class[] parameterTypes= method.getParameterTypes();
 
+            // skip methods with no parameters
             if (parameterTypes.length == 0)
                 continue;
 
             Class dataType= parameterTypes[0];
             String methodName= method.getName();
 
-            if (!methodName.startsWith("write") || methodNames.contains(methodName) || dataType == Void.TYPE)
+            // process only methods that write smth
+            if (!methodName.startsWith("write"))
                 continue;
-
-            methodNames.add(methodName);
 
             dataTypes.add(dataType);
 
-            System.out.format("%s %s()\n", dataType.getSimpleName(), methodName);
+            System.out.format("%s(%s)\n", methodName, dataType.getSimpleName());
 
         }
 
