@@ -10,19 +10,27 @@ public class Exercise15 {
 
     public static void main(String[] args) {
 
-        Set<String> readMethodNames= new HashSet<String>();
+        Set<String> methodNames= new HashSet<String>();
+        Set<Class> dataTypes= new HashSet<Class>();
 
-        for (Method method : DataInputStream.class.getMethods()) {
+        for (Method method : DataOutputStream.class.getMethods()) {
 
-            String methodName= method.getName();
-            Class retType= method.getReturnType();
+            Class[] parameterTypes= method.getParameterTypes();
 
-            if (!methodName.startsWith("read") || readMethodNames.contains(methodName) || retType == Void.TYPE)
+            if (parameterTypes.length == 0)
                 continue;
 
-            readMethodNames.add(methodName);
+            Class dataType= parameterTypes[0];
+            String methodName= method.getName();
 
-            System.out.format("%s %s()\n", retType.getSimpleName(), methodName);
+            if (!methodName.startsWith("write") || methodNames.contains(methodName) || dataType == Void.TYPE)
+                continue;
+
+            methodNames.add(methodName);
+
+            dataTypes.add(dataType);
+
+            System.out.format("%s %s()\n", dataType.getSimpleName(), methodName);
 
         }
 
