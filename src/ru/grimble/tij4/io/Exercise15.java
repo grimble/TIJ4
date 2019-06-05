@@ -17,6 +17,18 @@ public class Exercise15 {
         Method readMethod;
         Method writeMethod;
 
+        class TestData {
+            Object data;
+
+            public TestData(Object data) {
+                this.data=data;
+            }
+
+            public Method getReadMethod() {
+                return readMethod;
+            }
+        }
+
         public DataIOMethod(String name, Class dataType, Method readMethod, Method writeMethod) {
             this.name=name;
             this.dataType=dataType;
@@ -42,6 +54,8 @@ public class Exercise15 {
                 return r.nextBoolean();
             else if (dataType == Integer.TYPE)
                 return r.nextInt();
+            else if (dataType == Short.TYPE)
+                return (short)r.nextInt(Short.MAX_VALUE);
             else if (dataType == Long.TYPE)
                 return r.nextLong();
             else if (dataType == Float.TYPE)
@@ -49,7 +63,7 @@ public class Exercise15 {
             else if (dataType == Double.TYPE)
                 return r.nextDouble();
             else if (dataType == Character.TYPE)
-                return (char)r.nextInt();
+                return (char)r.nextInt(Character.MAX_VALUE);
             else if (dataType == String.class) {
                 byte[] bytes= new byte[16];
                 r.nextBytes(bytes);
@@ -112,31 +126,25 @@ public class Exercise15 {
 
     public static void main(String[] args) throws IOException, IllegalAccessException {
 
-        List<DataIOMethod> dataIOMethods= getDataIOMethods();
+        List<DataIOMethod> dataIOMethods=getDataIOMethods();
 
-        // todo: verify read data
-
-        Iterator<DataIOMethod> dataIOMethodIterator= dataIOMethods.iterator();
+        List<DataIOMethod.TestData> writtenTestData=new LinkedList<DataIOMethod.TestData>();
 
         DataOutputStream outputStream=
                 new DataOutputStream(
                         new BufferedOutputStream(
                                 new FileOutputStream("test.bin")));
 
-        while (dataIOMethodIterator.hasNext()) {
+        System.out.println("Writing test data");
 
-            DataIOMethod dataIOMethod= dataIOMethodIterator.next();
-
-            System.out.format("Data type %s, input %s, output %s\n",
-                    dataIOMethod.dataType.getSimpleName(),
-                    dataIOMethod.readMethod.getName(),
-                    dataIOMethod.writeMethod.getName()
-            );
+        for (DataIOMethod dataIOMethod : dataIOMethods) {
 
             try {
-                Object data= DataIOMethod.generateData(dataIOMethod.dataType);
+                Object data=DataIOMethod.generateData(dataIOMethod.dataType);
                 dataIOMethod.writeMethod.invoke(outputStream, data);
-                System.out.format("Invoked %s(%s)\n", dataIOMethod.writeMethod.getName(), data);
+                writtenTestData.add(dataIOMethod.new TestData(data));
+                System.out.format("Wrote %s via %s %s\n",
+                        data, dataIOMethod.writeMethod.getName(), dataIOMethod.dataType.getName());
             } catch (InvocationTargetException e) {
                 System.out.format("Error writing %s data type\n", dataIOMethod.dataType.getName());
                 e.printStackTrace();
@@ -146,8 +154,34 @@ public class Exercise15 {
 
         outputStream.close();
 
-    }
+        DataInputStream inputStream=
+                new DataInputStream(
+                        new BufferedInputStream(
+                                new FileInputStream("test.bin")));
 
+        Iterator<DataIOMethod.TestData> writtenTestDataIterator=writtenTestData.iterator();
+
+        System.out.println("\nReading test data");
+
+        for (DataIOMethod.TestData testData : writtenTestData) {
+
+            // todo: verify read data
+
+            try {
+                Object data=testData.getReadMethod().invoke(inputStream);
+                System.out.format("Read %s via %s %s\n",
+                        data,
+                        testData.getReadMethod().getName(),
+                        (data.equals(testData.data) ? "passed" : "failed")
+                );
+            } catch (InvocationTargetException e) {
+                System.out.format("Error reading via %s\n", testData.getReadMethod().getName());
+            }
+
+        }
+
+        inputStream.close();
+    }
 }
 
 
