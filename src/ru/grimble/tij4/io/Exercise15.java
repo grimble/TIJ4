@@ -1,7 +1,7 @@
 package ru.grimble.tij4.io;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -79,7 +79,7 @@ public class Exercise15 {
         return dataIOMethods;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, IllegalAccessException {
 
         List<DataIOMethod> dataIOMethods= getDataIOMethods();
 
@@ -89,17 +89,39 @@ public class Exercise15 {
 
         Iterator<DataIOMethod> dataIOMethodIterator= dataIOMethods.iterator();
 
+        DataOutputStream outputStream=
+                new DataOutputStream(
+                        new BufferedOutputStream(
+                                new FileOutputStream("test.bin")));
+
         while (dataIOMethodIterator.hasNext()) {
 
             DataIOMethod dataIOMethod= dataIOMethodIterator.next();
 
-            System.out.format("%s: input %s, output %s\n",
+            System.out.format("Data %s, input %s, output %s\n",
                     dataIOMethod.dataType.getSimpleName(),
                     dataIOMethod.readMethod.getName(),
                     dataIOMethod.writeMethod.getName()
             );
 
+            Object data=null;
+            try {
+                data=dataIOMethod.dataType.newInstance();
+            } catch (InstantiationException e) {
+                System.out.format("InstantiationException for %s\n", dataIOMethod.dataType);
+                continue;
+            }
+
+            try {
+                dataIOMethod.writeMethod.invoke(outputStream, data);
+            } catch (InvocationTargetException e) {
+                System.out.format("Error writing %s", dataIOMethod.dataType.getName());
+                e.printStackTrace();
+            }
+
         }
+
+        outputStream.close();
 
     }
 
