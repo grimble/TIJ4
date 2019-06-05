@@ -29,6 +29,37 @@ public class Exercise15 {
             this.dataType=dataType;
         }
 
+        static Random r= new Random(47);
+
+        /**
+         * Produces random data for different data types
+         * @param dataType  data type class
+         * @return  random value of data type class
+         */
+        static Object generateData(Class dataType) {
+
+            if (dataType == Boolean.TYPE)
+                return r.nextBoolean();
+            else if (dataType == Integer.TYPE)
+                return r.nextInt();
+            else if (dataType == Long.TYPE)
+                return r.nextLong();
+            else if (dataType == Float.TYPE)
+                return r.nextFloat();
+            else if (dataType == Double.TYPE)
+                return r.nextDouble();
+            else if (dataType == Character.TYPE)
+                return (char)r.nextInt();
+            else if (dataType == String.class) {
+                byte[] bytes= new byte[16];
+                r.nextBytes(bytes);
+                return new String(bytes);
+            }
+
+            return null;
+
+        }
+
     }
 
     /**
@@ -83,8 +114,6 @@ public class Exercise15 {
 
         List<DataIOMethod> dataIOMethods= getDataIOMethods();
 
-        // todo: write data
-        // todo: read data
         // todo: verify read data
 
         Iterator<DataIOMethod> dataIOMethodIterator= dataIOMethods.iterator();
@@ -98,24 +127,18 @@ public class Exercise15 {
 
             DataIOMethod dataIOMethod= dataIOMethodIterator.next();
 
-            System.out.format("Data %s, input %s, output %s\n",
+            System.out.format("Data type %s, input %s, output %s\n",
                     dataIOMethod.dataType.getSimpleName(),
                     dataIOMethod.readMethod.getName(),
                     dataIOMethod.writeMethod.getName()
             );
 
-            Object data=null;
             try {
-                data=dataIOMethod.dataType.newInstance();
-            } catch (InstantiationException e) {
-                System.out.format("InstantiationException for %s\n", dataIOMethod.dataType);
-                continue;
-            }
-
-            try {
+                Object data= DataIOMethod.generateData(dataIOMethod.dataType);
                 dataIOMethod.writeMethod.invoke(outputStream, data);
+                System.out.format("Invoked %s(%s)\n", dataIOMethod.writeMethod.getName(), data);
             } catch (InvocationTargetException e) {
-                System.out.format("Error writing %s", dataIOMethod.dataType.getName());
+                System.out.format("Error writing %s data type\n", dataIOMethod.dataType.getName());
                 e.printStackTrace();
             }
 
