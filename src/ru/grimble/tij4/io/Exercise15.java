@@ -5,89 +5,106 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class Exercise15 {
+/**
+ * Data IO streams read and write companion two methods
+ */
+class IOMethod {
+
+    String name;
+    Class dataType;
+    Method readMethod;
+    Method writeMethod;
+
+    class TestData {
+        Object data;
+
+        public TestData(Object data) {
+            this.data=data;
+        }
+
+        public Method getReadMethod() {
+            return readMethod;
+        }
+    }
+
+    public IOMethod(String name, Class dataType, Method readMethod, Method writeMethod) {
+        this.name=name;
+        this.dataType=dataType;
+        this.readMethod=readMethod;
+        this.writeMethod=writeMethod;
+    }
+
+    public IOMethod(String name, Class dataType) {
+        this.name=name;
+        this.dataType=dataType;
+    }
+
+    static Random r= new Random(47);
 
     /**
-     * Data IO streams read and write companion methods
+     * Produces random data for different data types
+     * @param dataType  data type class
+     * @return  random value of data type class
      */
-    static class DataIOMethod {
+    static Object generateData(Class dataType) {
 
-        String name;
-        Class dataType;
-        Method readMethod;
-        Method writeMethod;
-
-        class TestData {
-            Object data;
-
-            public TestData(Object data) {
-                this.data=data;
-            }
-
-            public Method getReadMethod() {
-                return readMethod;
-            }
+        if (dataType == Boolean.TYPE)
+            return r.nextBoolean();
+        else if (dataType == Integer.TYPE)
+            return r.nextInt();
+        else if (dataType == Short.TYPE)
+            return (short)r.nextInt(Short.MAX_VALUE);
+        else if (dataType == Long.TYPE)
+            return r.nextLong();
+        else if (dataType == Float.TYPE)
+            return r.nextFloat();
+        else if (dataType == Double.TYPE)
+            return r.nextDouble();
+        else if (dataType == Character.TYPE)
+            return (char)r.nextInt(Character.MAX_VALUE);
+        else if (dataType == String.class) {
+            byte[] bytes= new byte[16];
+            r.nextBytes(bytes);
+            return new String(bytes);
         }
 
-        public DataIOMethod(String name, Class dataType, Method readMethod, Method writeMethod) {
-            this.name=name;
-            this.dataType=dataType;
-            this.readMethod=readMethod;
-            this.writeMethod=writeMethod;
-        }
+        return null;
 
-        public DataIOMethod(String name, Class dataType) {
-            this.name=name;
-            this.dataType=dataType;
-        }
+    }
 
-        static Random r= new Random(47);
+}
 
-        /**
-         * Produces random data for different data types
-         * @param dataType  data type class
-         * @return  random value of data type class
-         */
-        static Object generateData(Class dataType) {
 
-            if (dataType == Boolean.TYPE)
-                return r.nextBoolean();
-            else if (dataType == Integer.TYPE)
-                return r.nextInt();
-            else if (dataType == Short.TYPE)
-                return (short)r.nextInt(Short.MAX_VALUE);
-            else if (dataType == Long.TYPE)
-                return r.nextLong();
-            else if (dataType == Float.TYPE)
-                return r.nextFloat();
-            else if (dataType == Double.TYPE)
-                return r.nextDouble();
-            else if (dataType == Character.TYPE)
-                return (char)r.nextInt(Character.MAX_VALUE);
-            else if (dataType == String.class) {
-                byte[] bytes= new byte[16];
-                r.nextBytes(bytes);
-                return new String(bytes);
-            }
+/**
+ * Test harness for companion IO classes.
+ * Attempts to consequently write and read by corresponding IO methods and compare results.
+ */
+class IOClassTest {
 
-            return null;
+    Class InputClass;
+    Class OutputClass;
 
-        }
+    List<IOMethod> dataIOMethods;
+    List<IOMethod.TestData> writtenTestData;
 
+    public IOClassTest(Class inputClass, Class outputClass) {
+        InputClass= inputClass;
+        OutputClass= outputClass;
+        dataIOMethods= getIOMethods();
     }
 
     /**
      * Finds data io streams r/w companion methods
      * @return  a list of methods that read and write the same data type
      */
-    static List<DataIOMethod> getDataIOMethods() {
+    List<IOMethod> getIOMethods() {
 
-        List<DataIOMethod> dataIOMethods= new LinkedList<DataIOMethod>();
+        List<IOMethod> dataIOMethods= new LinkedList<IOMethod>();
 
-        for (Method writeMethod : DataOutputStream.class.getMethods()) {
+        for (Method writeMethod : OutputClass.getMethods()) {
 
             // skip inhereted methods
-            if (writeMethod.getDeclaringClass() != DataOutputStream.class)
+            if (writeMethod.getDeclaringClass() != OutputClass)
                 continue;
 
             Class[] parameterTypes= writeMethod.getParameterTypes();
@@ -107,12 +124,12 @@ public class Exercise15 {
 
             Method readMethod;
             try {
-                readMethod=DataInputStream.class.getDeclaredMethod("read" + name);
+                readMethod=InputClass.getDeclaredMethod("read" + name);
             } catch (NoSuchMethodException e) {
                 continue;
             }
 
-            dataIOMethods.add(new DataIOMethod(
+            dataIOMethods.add(new IOMethod(
                     name,
                     dataType,
                     readMethod,
@@ -124,23 +141,16 @@ public class Exercise15 {
         return dataIOMethods;
     }
 
-    public static void main(String[] args) throws IOException, IllegalAccessException {
+    void write(Object outputStream) throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        List<DataIOMethod> dataIOMethods=getDataIOMethods();
+        writtenTestData= new LinkedList<IOMethod.TestData>();
 
-        List<DataIOMethod.TestData> writtenTestData=new LinkedList<DataIOMethod.TestData>();
+        System.out.println("\nWriting test data");
 
-        DataOutputStream outputStream=
-                new DataOutputStream(
-                        new BufferedOutputStream(
-                                new FileOutputStream("test.bin")));
-
-        System.out.println("Writing test data");
-
-        for (DataIOMethod dataIOMethod : dataIOMethods) {
+        for (IOMethod dataIOMethod : dataIOMethods) {
 
             try {
-                Object data=DataIOMethod.generateData(dataIOMethod.dataType);
+                Object data=IOMethod.generateData(dataIOMethod.dataType);
                 dataIOMethod.writeMethod.invoke(outputStream, data);
                 writtenTestData.add(dataIOMethod.new TestData(data));
                 System.out.format("Wrote %s via %s %s\n",
@@ -152,20 +162,15 @@ public class Exercise15 {
 
         }
 
-        outputStream.close();
+        OutputClass.getMethod("close").invoke(outputStream);
+        
+    }
 
-        DataInputStream inputStream=
-                new DataInputStream(
-                        new BufferedInputStream(
-                                new FileInputStream("test.bin")));
-
-        Iterator<DataIOMethod.TestData> writtenTestDataIterator=writtenTestData.iterator();
+    void read(Object inputStream) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         System.out.println("\nReading test data");
 
-        for (DataIOMethod.TestData testData : writtenTestData) {
-
-            // todo: verify read data
+        for (IOMethod.TestData testData : writtenTestData) {
 
             try {
                 Object data=testData.getReadMethod().invoke(inputStream);
@@ -180,7 +185,31 @@ public class Exercise15 {
 
         }
 
-        inputStream.close();
+        InputClass.getMethod("close").invoke(inputStream);
+
+    }
+}
+
+public class Exercise15 {
+
+    public static void main(String[] args) throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+        IOClassTest test= new IOClassTest(DataInputStream.class, DataOutputStream.class);
+
+        DataOutputStream outputStream=
+                new DataOutputStream(
+                        new BufferedOutputStream(
+                                new FileOutputStream("test.bin")));
+
+        test.write(outputStream);
+
+        DataInputStream inputStream=
+                new DataInputStream(
+                        new BufferedInputStream(
+                                new FileInputStream("test.bin")));
+
+        test.read(inputStream);
+
     }
 }
 
