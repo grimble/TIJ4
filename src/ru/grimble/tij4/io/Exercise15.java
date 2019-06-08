@@ -16,6 +16,7 @@ class IOMethod {
     Method writeMethod;
 
     class TestData {
+
         Object data;
 
         public TestData(Object data) {
@@ -25,6 +26,16 @@ class IOMethod {
         public Method getReadMethod() {
             return readMethod;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "IOMethod{" +
+                "name= " + name +
+                ", dataType= " + dataType +
+                ", readMethod= " + readMethod.getName() +
+                ", writeMethod= " + writeMethod.getName() +
+                '}';
     }
 
     public IOMethod(String name, Class dataType, Method readMethod, Method writeMethod) {
@@ -62,18 +73,24 @@ class IOMethod {
             return r.nextDouble();
         else if (dataType == Character.TYPE)
             return (char)r.nextInt(Character.MAX_VALUE);
+        else if (dataType == byte[].class) {
+            byte[] bytes= new byte[16];
+            r.nextBytes(bytes);
+            return bytes;
+        }
         else if (dataType == String.class) {
             byte[] bytes= new byte[16];
             r.nextBytes(bytes);
             return new String(bytes);
         }
 
+        System.out.format("Warning: Unable to generate data for %s\n", dataType);
+
         return null;
 
     }
 
 }
-
 
 /**
  * Test harness for companion IO classes.
@@ -84,20 +101,36 @@ class IOClassTest {
     Class InputClass;
     Class OutputClass;
 
-    List<IOMethod> dataIOMethods;
+    List<IOMethod> ioMethods;
     List<IOMethod.TestData> writtenTestData;
 
     public IOClassTest(Class inputClass, Class outputClass) {
         InputClass= inputClass;
         OutputClass= outputClass;
-        dataIOMethods= getIOMethods();
+        ioMethods= extractIOMethods();
+    }
+
+    @Override
+    public String toString() {
+
+        String ioMethodsView= "";
+
+        for (IOMethod iom : ioMethods) ioMethodsView+=iom.toString() + '\n';
+
+        String str=  "IOClassTest{" +
+                "InputClass=" + InputClass +
+                ", OutputClass=" + OutputClass +
+                ", \nioMethods=\n" + ioMethodsView +
+                '}';
+
+        return str;
     }
 
     /**
      * Finds data io streams r/w companion methods
      * @return  a list of methods that read and write the same data type
      */
-    List<IOMethod> getIOMethods() {
+    List<IOMethod> extractIOMethods() {
 
         List<IOMethod> dataIOMethods= new LinkedList<IOMethod>();
 
@@ -147,7 +180,7 @@ class IOClassTest {
 
         System.out.println("\nWriting test data");
 
-        for (IOMethod dataIOMethod : dataIOMethods) {
+        for (IOMethod dataIOMethod : ioMethods) {
 
             try {
                 Object data=IOMethod.generateData(dataIOMethod.dataType);
@@ -155,7 +188,7 @@ class IOClassTest {
                 writtenTestData.add(dataIOMethod.new TestData(data));
                 System.out.format("Wrote %s via %s %s\n",
                         data, dataIOMethod.writeMethod.getName(), dataIOMethod.dataType.getName());
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 System.out.format("Error writing %s data type\n", dataIOMethod.dataType.getName());
                 e.printStackTrace();
             }
