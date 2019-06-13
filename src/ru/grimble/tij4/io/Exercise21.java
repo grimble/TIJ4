@@ -12,7 +12,10 @@ public class Exercise21 {
 
         String newLine;
         while ((newLine= stdin.readLine()) != null && newLine.length() > 0) {
-            System.out.format("%s\n", newLine.toUpperCase());
+            String newLineUp= newLine.toUpperCase();
+            if(newLineUp.equals(newLine))
+                System.err.println("Nothing to convert.");
+            System.out.format("%s\n", newLineUp);
         }
     }
 
