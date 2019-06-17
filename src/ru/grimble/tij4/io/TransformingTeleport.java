@@ -97,6 +97,10 @@ abstract class Teleport {
         return o;
     }
 
+    /**
+     * Called after an object came in
+     * @param o received object
+     */
     abstract void onRecieve(Object o);
 }
 
