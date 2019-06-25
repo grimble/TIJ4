@@ -8,7 +8,7 @@ import java.io.*;
 class Alien implements Externalizable {
 
     String name;
-    String appearence;
+    String appearence= "Weired";
 
     public Alien() {}
 
@@ -23,19 +23,9 @@ class Alien implements Externalizable {
     @Override
     public String toString() {
 
-        String appearence;
-
-        if (this.appearence == null)
-            appearence= "";
-        else
-            appearence= this.appearence;
-
-        if (appearence.length() == 0)
-            appearence= "Weired";
-        else
-            appearence= appearence.substring(0, 1).toUpperCase() + appearence.substring(1);
-
-        return String.format("%s alien %s", appearence, name);
+        return String.format("%s alien %s",
+                this.appearence.substring(0, 1).toUpperCase() + this.appearence.substring(1),
+                name);
     }
 
     @Override
@@ -52,17 +42,17 @@ class Alien implements Externalizable {
 /**
  * Object IO engine with on read transformation stub
  */
-abstract class Teleport {
+abstract class Teleport<T> {
 
     String portal;
     ObjectOutputStream out;
     ObjectInputStream in;
 
     public Teleport(String portal) {
-        this.portal=portal;
+        this.portal= portal;
     }
 
-    public void send(Object o) throws IOException {
+    public void send(T o) throws IOException {
 
         out= new ObjectOutputStream(new FileOutputStream(portal));
 
@@ -78,15 +68,15 @@ abstract class Teleport {
 
     }
 
-    public Object recieve() throws IOException, ClassNotFoundException {
+    public T receive() throws IOException, ClassNotFoundException {
 
         in= new ObjectInputStream(new FileInputStream(portal));
 
         System.out.println("Teleport opened");
 
-        Object o= (Alien)in.readObject();
+        T o= (T)in.readObject();
 
-        onRecieve(o);
+        onReceive(o);
 
         System.out.format("%s came from teleport\n", o);
 
@@ -101,7 +91,7 @@ abstract class Teleport {
      * Called after an object came in
      * @param o received object
      */
-    abstract void onRecieve(Object o);
+    abstract void onReceive(T o);
 }
 
 public class TransformingTeleport {
@@ -117,18 +107,18 @@ public class TransformingTeleport {
         System.out.format("Sam is %s\n", sam);
 
         // Creating teleport with nice transformation
-        Teleport niceTeleport= new Teleport("nicifier.bin") {
+        Teleport<Alien> niceAlienport= new Teleport<Alien>("nicifier.bin") {
             @Override
-            void onRecieve(Object o) {
-                ((Alien)o).setAppearence("nice");
+            void onReceive(Alien o) {
+                o.setAppearence("nice");
             }
         };
 
         // Sending alien via teleport
-        niceTeleport.send(sam);
+        niceAlienport.send(sam);
 
         // Recieving alien from teleport
-        sam= (Alien)niceTeleport.recieve();
+        sam= niceAlienport.receive();
 
         // Seeing what happened
         System.out.format("Sam is %s\n", sam);
